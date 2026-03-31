@@ -29,6 +29,15 @@ in
         (i.e., `/run/user/<uid>/oo7-ssh-agent.sock`).
       '';
     };
+
+    idleTimeout = lib.mkOption {
+      type = lib.types.int;
+      default = 300;
+      description = ''
+        Exit after N seconds of inactivity (systemd restarts on next connection).
+        Set to 0 to disable.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -60,7 +69,10 @@ in
           Wants = ["oo7-daemon.service"];
         };
       serviceConfig = {
-        ExecStart = "${cfg.package}/bin/oo7-ssh-agent";
+        ExecStart = lib.concatStringsSep " " [
+          "${cfg.package}/bin/oo7-ssh-agent"
+          "--idle-timeout ${toString cfg.idleTimeout}"
+        ];
         Restart = "on-failure";
         RestartSec = 3;
         Environment = "RUST_LOG=warn";
@@ -72,5 +84,12 @@ in
       if cfg.socketPath != null
       then cfg.socketPath
       else "/run/user/%U/${socketName}";
+
+    # Prevent SSH from trying too many keys from the agent before the
+    # server disconnects. With a keyring-backed agent, keys accumulate
+    # over time. This limits identity offers to 5 (configurable by user).
+    programs.ssh.extraConfig = lib.mkDefault ''
+      IdentitiesOnly yes
+    '';
   };
 }

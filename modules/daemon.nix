@@ -20,6 +20,17 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Prevent two Secret Service providers fighting over org.freedesktop.secrets.
+    assertions = [
+      {
+        assertion = !config.services.gnome.gnome-keyring.enable;
+        message = ''
+          services.oo7.daemon and services.gnome.gnome-keyring cannot both be enabled.
+          Both register as org.freedesktop.secrets providers. Disable one of them.
+        '';
+      }
+    ];
+
     # Register the D-Bus service so oo7-daemon is activated on demand
     # when anything queries org.freedesktop.secrets.
     services.dbus.packages = [cfg.package];
@@ -39,8 +50,7 @@ in
       wantedBy = ["default.target"];
     };
 
-    # Disable gnome-keyring to avoid two providers fighting
-    # over org.freedesktop.secrets.
+    # Disable gnome-keyring by default to avoid conflicts.
     services.gnome.gnome-keyring.enable = lib.mkDefault false;
   };
 }

@@ -7,6 +7,7 @@
 
 let
   cfg = config.services.oo7.portal;
+  daemonCfg = config.services.oo7.daemon;
 in
 {
   options.services.oo7.portal = {
@@ -31,10 +32,14 @@ in
 
     # Systemd user service for the portal.
     systemd.user.services.oo7-portal = {
-      unitConfig = {
-        Description = "oo7 XDG Desktop Portal (Secret)";
-        After = ["oo7-daemon.service"];
-      };
+      unitConfig =
+        {
+          Description = "oo7 XDG Desktop Portal (Secret)";
+        }
+        // lib.optionalAttrs daemonCfg.enable {
+          After = ["oo7-daemon.service"];
+          Wants = ["oo7-daemon.service"];
+        };
       serviceConfig = {
         ExecStart = "${cfg.package}/libexec/oo7-portal";
         Restart = "on-failure";
