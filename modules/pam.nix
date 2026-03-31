@@ -24,11 +24,12 @@ in
 
     services = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
-      example = ["swaylock" "hyprlock"];
+      default = ["login" "greetd"];
+      example = ["login" "greetd" "swaylock" "hyprlock"];
       description = ''
-        Additional PAM services to add oo7 auto-unlock to.
-        Login/greeter services (login, greetd, gdm) are always included.
+        PAM services to add oo7 auto-unlock to.
+        Defaults to login and greetd. Add screen lockers or
+        other greeters (gdm, sddm) as needed.
       '';
     };
   };
@@ -41,29 +42,26 @@ in
     # oo7-daemon can be D-Bus activated, and pam_oo7.so sends
     # the login password to unlock the default collection.
     #
-    # mkOrder 12500 ensures we come after pam_systemd.so (typically
-    # at ~10000) but before session cleanup.
+    # Order 11000: after pam_systemd.so (~10000), before limits
+    # (12200) and deny rules (12500).
     security.pam.services =
       let
         pamConfig = {
           rules = {
             auth.oo7 = {
-              order = 12200;
+              order = 11000;
               control = "optional";
               modulePath = "${pamPkg}/lib/security/pam_oo7.so";
             };
             session.oo7 = {
-              order = 12200;
+              order = 11000;
               control = "optional";
               modulePath = "${pamPkg}/lib/security/pam_oo7.so";
               args = ["auto_start"];
             };
           };
         };
-        # Always include login-type services.
-        loginServices = ["login" "greetd" "gdm" "sddm"];
-        allServices = loginServices ++ cfg.services;
       in
-        lib.genAttrs allServices (_: pamConfig);
+        lib.genAttrs cfg.services (_: pamConfig);
   };
 }
