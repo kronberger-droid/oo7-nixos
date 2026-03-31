@@ -30,20 +30,10 @@ in
       extraPortals = [cfg.package];
     };
 
-    # Systemd user service for the portal.
-    systemd.user.services.oo7-portal = {
-      unitConfig =
-        {
-          Description = "oo7 XDG Desktop Portal (Secret)";
-        }
-        // lib.optionalAttrs daemonCfg.enable {
-          After = ["oo7-daemon.service"];
-          Wants = ["oo7-daemon.service"];
-        };
-      serviceConfig = {
-        ExecStart = "${cfg.package}/libexec/oo7-portal";
-        Restart = "on-failure";
-      };
-    };
+    # Install the systemd user service shipped by oo7-portal.
+    # The package unit already has correct ordering (After/PartOf
+    # graphical-session.target, Wants xdg-desktop-portal.service)
+    # and D-Bus activation config.
+    systemd.packages = [cfg.package];
   };
 }

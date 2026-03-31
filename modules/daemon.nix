@@ -35,20 +35,10 @@ in
     # when anything queries org.freedesktop.secrets.
     services.dbus.packages = [cfg.package];
 
-    # Install the systemd user service unit shipped by oo7-server.
+    # Install the systemd user service + socket units shipped by oo7-server.
+    # The package already provides ExecStart, security hardening, and
+    # WantedBy=default.target — no need to override anything here.
     systemd.packages = [cfg.package];
-
-    # Ensure oo7-daemon starts in the user session.
-    systemd.user.services.oo7-daemon = {
-      unitConfig = {
-        Description = "oo7 Secret Service daemon";
-      };
-      serviceConfig = {
-        ExecStart = "${cfg.package}/libexec/oo7-daemon";
-        Restart = "on-failure";
-      };
-      wantedBy = ["default.target"];
-    };
 
     # Disable gnome-keyring by default to avoid conflicts.
     services.gnome.gnome-keyring.enable = lib.mkDefault false;
