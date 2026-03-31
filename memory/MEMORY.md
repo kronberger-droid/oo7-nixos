@@ -1,0 +1,2 @@
+- [Use cargo add](feedback_cargo_add.md) — always use `cargo add` instead of editing Cargo.toml manually
+- [Use rust-overlay only](feedback_rust_overlay.md) — no fenix, rust-overlay handles everything
