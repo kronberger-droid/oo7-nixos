@@ -48,12 +48,12 @@ in
         pamConfig = {
           rules = {
             auth.oo7 = {
-              order = 12500;
+              order = 12200;
               control = "optional";
               modulePath = "${pamPkg}/lib/security/pam_oo7.so";
             };
             session.oo7 = {
-              order = 12500;
+              order = 12200;
               control = "optional";
               modulePath = "${pamPkg}/lib/security/pam_oo7.so";
               args = ["auto_start"];
