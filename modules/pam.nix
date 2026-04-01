@@ -52,9 +52,17 @@ in
   config = lib.mkIf cfg.enable {
     # PAM configuration for auto-unlock at login.
     #
-    # Auth phase: must run AFTER pam_unix (order 11700) so that
-    # PAM_AUTHTOK is populated with the login password. pam_oo7
-    # reads PAM_AUTHTOK and stashes it for the session phase.
+    # Auth phase: NixOS's default pam_unix uses `sufficient` control
+    # (order 11700). When it succeeds, PAM stops processing further
+    # auth rules — so anything after it never runs.
+    #
+    # To capture PAM_AUTHTOK before the stack terminates, we insert
+    # an `optional` pam_unix early run (order 11500) that validates
+    # the password and populates PAM_AUTHTOK, then pam_oo7 (order
+    # 11600) stashes it. The existing `sufficient` pam_unix at 11700
+    # uses `try_first_pass` and succeeds without re-prompting.
+    #
+    # This is the same split pattern gnome-keyring uses.
     #
     # Session phase: must run AFTER pam_systemd (order 12000) which
     # starts systemd --user and makes D-Bus available. pam_oo7
@@ -69,8 +77,14 @@ in
       let
         pamConfig = {
           rules = {
+            auth.unix-early = {
+              order = 11500;
+              control = "optional";
+              modulePath = "${pkgs.pam}/lib/security/pam_unix.so";
+              args = ["likeauth" "nullok"];
+            };
             auth.oo7 = {
-              order = 11800;
+              order = 11600;
               control = "optional";
               modulePath = "${pamPkg}/lib/security/pam_oo7.so";
             };
