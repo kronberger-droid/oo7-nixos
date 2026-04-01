@@ -97,7 +97,7 @@ in
     # terminal prompt gets "poisoned" into whatever CLI app owns the
     # TTY. `prefer` (OpenSSH 8.4+) forces the askpass program even
     # when a TTY is available.
-    environment.sessionVariables.SSH_ASKPASS = "${pkgs.gcr}/libexec/gcr-ssh-askpass";
+    environment.sessionVariables.SSH_ASKPASS = lib.mkForce "${pkgs.gcr}/libexec/gcr-ssh-askpass";
     environment.sessionVariables.SSH_ASKPASS_REQUIRE = "prefer";
 
   };
