@@ -37,17 +37,20 @@ in
   config = lib.mkIf cfg.enable {
     # PAM configuration for auto-unlock at login.
     #
-    # The session module MUST run AFTER pam_systemd.so (which starts
-    # systemd --user and makes D-Bus available). On NixOS, pam_systemd
-    # is at order 12000, so we use 12100 to guarantee D-Bus is ready.
-    # At that point oo7-daemon can be D-Bus activated, and pam_oo7.so
-    # sends the login password to unlock the default collection.
+    # Auth phase: must run AFTER pam_unix (order 11700) so that
+    # PAM_AUTHTOK is populated with the login password. pam_oo7
+    # reads PAM_AUTHTOK and stashes it for the session phase.
+    #
+    # Session phase: must run AFTER pam_systemd (order 12000) which
+    # starts systemd --user and makes D-Bus available. pam_oo7
+    # retrieves the stashed password and sends it to oo7-daemon
+    # via the PAM listener socket to unlock the default collection.
     security.pam.services =
       let
         pamConfig = {
           rules = {
             auth.oo7 = {
-              order = 11000;
+              order = 11800;
               control = "optional";
               modulePath = "${pamPkg}/lib/security/pam_oo7.so";
             };
