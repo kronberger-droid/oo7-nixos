@@ -4,8 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # TODO: change to GitHub URL once published
-    oo7-ssh-agent.url = "git+file:///home/kronberger/Programming/rust/oo7-ssh-agent";
+    oo7-ssh-agent.url = "github:kronberger-droid/oo7-ssh-agent";
     oo7-ssh-agent.inputs.nixpkgs.follows = "nixpkgs";
   };
 
