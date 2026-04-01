@@ -35,10 +35,12 @@ in
     # when anything queries org.freedesktop.secrets.
     services.dbus.packages = [cfg.package];
 
-    # Install the systemd user service + socket units shipped by oo7-server.
-    # The package already provides ExecStart, security hardening, and
-    # WantedBy=default.target — no need to override anything here.
+    # Install the systemd user service shipped by oo7-server.
+    # The package provides ExecStart and security hardening.
+    # NixOS ignores [Install] sections from systemd.packages, so we
+    # must declare wantedBy explicitly.
     systemd.packages = [cfg.package];
+    systemd.user.services.oo7-daemon.wantedBy = ["default.target"];
 
     # Disable gnome-keyring by default to avoid conflicts.
     services.gnome.gnome-keyring.enable = lib.mkDefault false;
