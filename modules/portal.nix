@@ -31,9 +31,11 @@ in
     };
 
     # Install the systemd user service shipped by oo7-portal.
-    # The package unit already has correct ordering (After/PartOf
-    # graphical-session.target, Wants xdg-desktop-portal.service)
-    # and D-Bus activation config.
+    # The package unit has correct ordering (After/PartOf
+    # graphical-session.target) and D-Bus activation config.
+    # NixOS ignores [Install] sections from systemd.packages,
+    # so we must declare wantedBy explicitly.
     systemd.packages = [cfg.package];
+    systemd.user.services.oo7-portal.wantedBy = ["graphical-session.target"];
   };
 }

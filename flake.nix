@@ -15,8 +15,8 @@
     oo7-ssh-agent,
     ...
   }: let
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
+    supportedSystems = ["x86_64-linux" "aarch64-linux"];
+    forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
   in {
     nixosModules = {
       daemon = import ./modules/daemon.nix;
@@ -35,10 +35,12 @@
       };
     };
 
-    packages.${system} = {
+    packages = forAllSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
       oo7-ssh-agent = oo7-ssh-agent.packages.${system}.oo7-ssh-agent;
       oo7-pam = pkgs.callPackage ./pkgs/oo7-pam.nix {};
       default = self.packages.${system}.oo7-ssh-agent;
-    };
+    });
   };
 }
