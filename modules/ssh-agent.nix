@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   oo7-ssh-agent,
   ...
 }:
@@ -89,6 +90,15 @@ in
       if cfg.socketPath != null
       then cfg.socketPath
       else "\${XDG_RUNTIME_DIR}/${socketName}";
+
+    # Route SSH passphrase prompts through a GUI dialog instead of the
+    # TTY. Without this, if SSH falls through to key files on disk
+    # (e.g. the agent is locked or a key isn't stored yet), the
+    # terminal prompt gets "poisoned" into whatever CLI app owns the
+    # TTY. `prefer` (OpenSSH 8.4+) forces the askpass program even
+    # when a TTY is available.
+    environment.sessionVariables.SSH_ASKPASS = "${pkgs.gcr}/libexec/gcr-ssh-askpass";
+    environment.sessionVariables.SSH_ASKPASS_REQUIRE = "prefer";
 
   };
 }
