@@ -59,17 +59,17 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1774971393,
-        "narHash": "sha256-f5o/gVXYwBvMNSemsXqNavvc1t2QBO729neUO3mCoGk=",
-        "ref": "refs/heads/main",
-        "rev": "c687d41a5a32bd105fd02eb436c54f925254df71",
-        "revCount": 4,
-        "type": "git",
-        "url": "file:///home/kronberger/Programming/rust/oo7-ssh-agent"
+        "lastModified": 1775046597,
+        "narHash": "sha256-Bd9s0Pgcn+B1Au0DQpFD8q67n6r/AgbiCYHegi1CUIA=",
+        "owner": "kronberger-droid",
+        "repo": "oo7-ssh-agent",
+        "rev": "46b6f173b39f96f2bb6b79befae089f248f689ad",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/kronberger/Programming/rust/oo7-ssh-agent"
+        "owner": "kronberger-droid",
+        "repo": "oo7-ssh-agent",
+        "type": "github"
       }
     },
     "root": {
