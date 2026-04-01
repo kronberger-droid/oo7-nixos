@@ -31,9 +31,12 @@ in
       }
     ];
 
-    # Register the D-Bus service so oo7-daemon is activated on demand
-    # when anything queries org.freedesktop.secrets.
-    services.dbus.packages = [cfg.package];
+    # Register D-Bus services:
+    # - oo7-daemon: activated when anything queries org.freedesktop.secrets
+    # - gcr: provides org.gnome.keyring.SystemPrompter for graphical
+    #   password dialogs (collection unlock/create). This is a lightweight
+    #   GTK dialog, not the full gnome-keyring stack.
+    services.dbus.packages = [cfg.package pkgs.gcr];
 
     # Install the systemd user service shipped by oo7-server.
     # The package provides ExecStart and security hardening.
@@ -41,6 +44,7 @@ in
     # must declare wantedBy explicitly.
     systemd.packages = [cfg.package];
     systemd.user.services.oo7-daemon.wantedBy = ["default.target"];
+
 
     # Disable gnome-keyring by default to avoid conflicts.
     services.gnome.gnome-keyring.enable = lib.mkDefault false;
