@@ -80,10 +80,15 @@ in
     };
 
     # Set SSH_AUTH_SOCK for login shells (sourced by greeter/PAM).
+    # Note: %U is a systemd specifier that only works in unit files,
+    # not in environment variables. Use $XDG_RUNTIME_DIR at the shell
+    # level, or the literal /run/user/<uid> path here. Since NixOS
+    # session variables are static strings, we use a pam_env-compatible
+    # form that expands at login time.
     environment.sessionVariables.SSH_AUTH_SOCK =
       if cfg.socketPath != null
       then cfg.socketPath
-      else "/run/user/%U/${socketName}";
+      else "\${XDG_RUNTIME_DIR}/${socketName}";
 
   };
 }
