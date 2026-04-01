@@ -85,11 +85,5 @@ in
       then cfg.socketPath
       else "/run/user/%U/${socketName}";
 
-    # Prevent SSH from trying too many keys from the agent before the
-    # server disconnects. With a keyring-backed agent, keys accumulate
-    # over time. This limits identity offers to 5 (configurable by user).
-    programs.ssh.extraConfig = lib.mkDefault ''
-      IdentitiesOnly yes
-    '';
   };
 }

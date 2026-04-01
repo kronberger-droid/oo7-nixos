@@ -45,6 +45,9 @@ in
     systemd.packages = [cfg.package];
     systemd.user.services.oo7-daemon.wantedBy = ["default.target"];
 
+    # Provide libsecret so apps and secret-tool can talk to the
+    # Secret Service via the standard C API.
+    environment.systemPackages = [pkgs.libsecret];
 
     # Disable gnome-keyring by default to avoid conflicts.
     services.gnome.gnome-keyring.enable = lib.mkDefault false;
